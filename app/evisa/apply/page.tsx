@@ -104,7 +104,7 @@ const onSubmit = async (data: any) => {
   const totalFee = fields.length * FEE_PER_PASSENGER
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-8 max-w-4xl mx-auto mt-10 bg-white rounded-2xl shadow-lg">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-8 max-w-4xl mx-auto mt-10 mb-10 bg-white rounded-2xl shadow-lg">
       <div className="space-y-2">
         <label className="block text-lg font-semibold text-gray-800">Staying Time (From - To)</label>
         <DatePicker

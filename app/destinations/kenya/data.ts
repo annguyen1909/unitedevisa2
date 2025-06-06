@@ -63,6 +63,14 @@ const kenya: DestinationData = {
       question: "Do I need a printed copy of the ETA?",
       answer: "Yes, it is recommended to carry a printed copy.",
     },
+    {
+      question: "How long does the Kenya ETA take?",
+      answer: "It is typically processed within 1 business day.",
+    },
+    {
+      question: "How long does the Kenya ETA take?",
+      answer: "It is typically processed within 1 business day.",
+    },
   ],
 };
 

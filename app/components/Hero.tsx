@@ -48,7 +48,7 @@ export default function Hero() {
 
   return (
     <section
-      className="bg-cover bg-center min-h-[100vh] flex items-center justify-center text-white text-center px-4"
+      className="bg-cover bg-center min-h-[41.65vh] flex items-center justify-center text-white text-center px-4"
       style={{ backgroundImage: "url('/images/hero.png')" }}
     >
       <div className="max-w-4xl">
@@ -57,7 +57,7 @@ export default function Hero() {
         </h1>
         <p className="text-lg md:text-xl mt-4">Fast – Reliable – Experts Support 24/7</p>
 
-        <div className="bg-white rounded-lg p-2 mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
+        <div className="bg-white rounded-lg p-2 mt-24 grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
           <select
             className="border border-gray-300 rounded px-3 py-2"
             value={nationality}

@@ -47,7 +47,7 @@ export default function HeaderBanner() {
 
         {!isLoading && (
           user ? (
-            <Link href="/profile" className="py-2 px-4 rounded-xl bg-[#2a8021] transition-all duration-300 hover:bg-[#69a862] flex items-center gap-2 text-white">
+            <Link href="/profile" className="py-2 px-4 mr-1.5 rounded-md bg-[#2a8021] transition-all duration-300 hover:bg-[#69a862] flex items-center gap-2 text-white">
               <UserRoundPen className="w-4 h-4" />
               Profile
             </Link>
