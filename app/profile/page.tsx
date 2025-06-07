@@ -25,7 +25,7 @@ export default function ProfilePage() {
       setProfile(data)
     }
     load()
-  }, [])
+  }, [router])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

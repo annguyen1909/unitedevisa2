@@ -13,7 +13,7 @@ export default function LoginPage() {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) router.replace("/profile")
     })
-  }, [])
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

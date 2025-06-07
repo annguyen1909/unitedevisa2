@@ -6,7 +6,9 @@ import dynamic from 'next/dynamic'
 import 'react-phone-input-2/lib/style.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useState } from 'react'
+import type { User } from '@supabase/supabase-js'
 
+// Dynamically imported components (client-side only)
 const Select = dynamic(() => import('react-select'), { ssr: false })
 const DatePicker = dynamic(() => import('react-datepicker'), { ssr: false })
 const PhoneInput = dynamic(() => import('react-phone-input-2'), { ssr: false })
@@ -34,13 +36,15 @@ const paperTypes = [
   { value: 'Travel Document', label: 'Travel Document' },
 ]
 
+type Option = { value: string; label: string }
+
 type Passenger = {
-  destination?: { value: string; label: string }
-  visaType?: { value: string; label: string }
+  destination?: Option
+  visaType?: Option
   email?: string
   phone?: string
-  nationality?: { value: string; label: string }
-  paperType?: { value: string; label: string }
+  nationality?: Option
+  paperType?: Option
 }
 
 type ApplicationFormValues = {
@@ -50,7 +54,7 @@ type ApplicationFormValues = {
 export default function ApplicationForm() {
   const { register, handleSubmit, control } = useForm<ApplicationFormValues>({
     defaultValues: {
-      passengers: [{}], // Start with one passenger form
+      passengers: [{}],
     },
   })
 
@@ -62,45 +66,46 @@ export default function ApplicationForm() {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
   const [startDate, endDate] = dateRange
 
-const onSubmit = async (data: ApplicationFormValues) => {
-  if (!startDate || !endDate) {
-    alert('Please select a staying time range.')
-    return
+  const onSubmit = async (data: ApplicationFormValues) => {
+    if (!startDate || !endDate) {
+      alert('Please select a staying time range.')
+      return
+    }
+
+    const result = await supabase.auth.getUser()
+    const user: User | null = result.data.user
+    const userError = result.error
+
+    if (userError || !user) {
+      alert('You must be signed in to submit an application.')
+      return
+    }
+
+    const applications = data.passengers.map((p): Record<string, string> => ({
+      user_id: user.id,
+      destination: p.destination?.value ?? '',
+      visa_type: p.visaType?.value ?? '',
+      email: p.email ?? '',
+      phone: p.phone ?? '',
+      nationality: p.nationality?.value ?? '',
+      paper_type: p.paperType?.value ?? '',
+      staying_from: startDate.toISOString(),
+      staying_to: endDate.toISOString(),
+      status: 'pending',
+      inserted_at: new Date().toISOString(),
+    }))
+
+    const { error } = await supabase.from('visa_applications').insert(applications)
+
+    if (error) {
+      console.error('Submission error:', error)
+      alert('Something went wrong. Please try again.')
+    } else {
+      alert('Applications submitted successfully!')
+    }
   }
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-
-  if (userError || !user) {
-    alert('You must be signed in to submit an application.')
-    return
-  }
-
-  const applications = data.passengers.map((p: Passenger) => ({
-    user_id: user.id,
-    destination: p.destination?.value,
-    visa_type: p.visaType?.value,
-    email: p.email,
-    phone: p.phone,
-    nationality: p.nationality?.value,
-    paper_type: p.paperType?.value,
-    staying_from: startDate.toISOString(),
-    staying_to: endDate.toISOString(),
-    status: 'pending',
-    inserted_at: new Date().toISOString(),
-  }))
-
-  const { error } = await supabase.from('visa_applications').insert(applications)
-
-  if (error) {
-    console.error('Submission error:', error)
-    alert('Something went wrong. Please try again.')
-  } else {
-    alert('Applications submitted successfully!')
-  }
-}
-
-
-  const FEE_PER_PASSENGER = 49.99 // change as needed
+  const FEE_PER_PASSENGER = 49.99
   const totalFee = fields.length * FEE_PER_PASSENGER
 
   return (
@@ -111,7 +116,7 @@ const onSubmit = async (data: ApplicationFormValues) => {
           selectsRange
           startDate={startDate}
           endDate={endDate}
-          onChange={(update) => setDateRange(update)}
+          onChange={(update: [Date | null, Date | null]) => setDateRange(update)}
           className="border border-gray-300 px-4 py-3 w-full rounded-xl focus:ring-2 focus:ring-[#16610E] focus:border-transparent transition-all duration-200"
           placeholderText="Select date range"
         />
@@ -122,161 +127,88 @@ const onSubmit = async (data: ApplicationFormValues) => {
           <h3 className="text-xl font-bold text-gray-800">Passenger {index + 1}</h3>
 
           {/* Destination */}
-          <div className="space-y-2">
-            <Controller
-              name={`passengers.${index}.destination`}
-              control={control}
-              rules={{ required: 'Destination is required' }}
-              render={({ field }) => (
-                <Select 
-                  {...field} 
-                  options={destinations} 
-                  placeholder="Select destination"
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderColor: 'rgb(209 213 219)',
-                      borderRadius: '0.75rem',
-                      padding: '0.25rem',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#16610E'
-                      }
-                    })
-                  }}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name={`passengers.${index}.destination`}
+            control={control}
+            rules={{ required: 'Destination is required' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={destinations}
+                placeholder="Select destination"
+              />
+            )}
+          />
 
           {/* Visa Type */}
-          <div className="space-y-2">
-            <Controller
-              name={`passengers.${index}.visaType`}
-              control={control}
-              rules={{ required: 'Visa Type is required' }}
-              render={({ field }) => (
-                <Select 
-                  {...field} 
-                  options={visaTypes} 
-                  placeholder="Select visa type"
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderColor: 'rgb(209 213 219)',
-                      borderRadius: '0.75rem',
-                      padding: '0.25rem',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#16610E'
-                      }
-                    })
-                  }}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name={`passengers.${index}.visaType`}
+            control={control}
+            rules={{ required: 'Visa Type is required' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={visaTypes}
+                placeholder="Select visa type"
+              />
+            )}
+          />
 
           {/* Email */}
-          <div className="space-y-2">
-            <input
-              type="email"
-              {...register(`passengers.${index}.email`, { required: 'Email is required' })}
-              placeholder="Email"
-              className="border border-gray-300 px-4 py-3 w-full rounded-xl focus:ring-2 focus:ring-[#16610E] focus:border-transparent transition-all duration-200"
-            />
-          </div>
+          <input
+            type="email"
+            {...register(`passengers.${index}.email`, { required: 'Email is required' })}
+            placeholder="Email"
+            className="border border-gray-300 px-4 py-3 w-full rounded-xl focus:ring-2 focus:ring-[#16610E] focus:border-transparent transition-all duration-200"
+          />
 
           {/* Phone */}
-          <div className="space-y-2">
-            <Controller
-              name={`passengers.${index}.phone`}
-              control={control}
-              rules={{ required: 'Phone is required' }}
-              render={({ field }) => (
-                <PhoneInput 
-                  {...field} 
-                  country="us" 
-                  inputStyle={{ 
-                    width: '100%',
-                    borderRadius: '0.75rem',
-                    borderColor: 'rgb(209 213 219)',
-                    padding: '0.75rem',
-                    transition: 'all 0.2s'
-                  }}
-                  buttonStyle={{
-                    borderColor: 'rgb(209 213 219)',
-                    borderRadius: '0.75rem 0 0 0.75rem'
-                  }}
-                  enableSearch 
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name={`passengers.${index}.phone`}
+            control={control}
+            rules={{ required: 'Phone is required' }}
+            render={({ field }) => (
+              <PhoneInput
+                {...field}
+                country="us"
+                inputStyle={{
+                  width: '100%',
+                  borderRadius: '0.75rem',
+                  borderColor: 'rgb(209 213 219)',
+                  padding: '0.75rem',
+                }}
+                enableSearch
+              />
+            )}
+          />
 
           {/* Nationality */}
-          <div className="space-y-2">
-            <Controller
-              name={`passengers.${index}.nationality`}
-              control={control}
-              rules={{ required: 'Nationality is required' }}
-              render={({ field }) => (
-                <Select 
-                  {...field} 
-                  options={nationalities} 
-                  placeholder="Select nationality"
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderColor: 'rgb(209 213 219)',
-                      borderRadius: '0.75rem',
-                      padding: '0.25rem',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#16610E'
-                      }
-                    })
-                  }}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name={`passengers.${index}.nationality`}
+            control={control}
+            rules={{ required: 'Nationality is required' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={nationalities}
+                placeholder="Select nationality"
+              />
+            )}
+          />
 
           {/* Paper Type */}
-          <div className="space-y-2">
-            <Controller
-              name={`passengers.${index}.paperType`}
-              control={control}
-              rules={{ required: 'Paper type is required' }}
-              render={({ field }) => (
-                <Select 
-                  {...field} 
-                  options={paperTypes} 
-                  placeholder="Select paper type"
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderColor: 'rgb(209 213 219)',
-                      borderRadius: '0.75rem',
-                      padding: '0.25rem',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        borderColor: '#16610E'
-                      }
-                    })
-                  }}
-                />
-              )}
-            />
-          </div>
+          <Controller
+            name={`passengers.${index}.paperType`}
+            control={control}
+            rules={{ required: 'Paper type is required' }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={paperTypes}
+                placeholder="Select paper type"
+              />
+            )}
+          />
         </div>
       ))}
 
@@ -295,8 +227,8 @@ const onSubmit = async (data: ApplicationFormValues) => {
         <p className="font-semibold text-xl text-gray-800">Total Fee: <span className="text-[#16610E]">${totalFee}</span></p>
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         className="bg-[#16610E] text-white px-8 py-4 rounded-xl font-bold w-full hover:bg-[#1a7a11] transition-all duration-200 text-lg"
       >
         Submit Applications
