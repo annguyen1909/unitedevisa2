@@ -6,11 +6,18 @@ import dynamic from 'next/dynamic'
 import 'react-phone-input-2/lib/style.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useState } from 'react'
+import type { DatePickerProps } from 'react-datepicker';
 import type { User } from '@supabase/supabase-js'
 
 // Dynamically imported components (client-side only)
 const Select = dynamic(() => import('react-select'), { ssr: false })
-const DatePicker = dynamic(() => import('react-datepicker'), { ssr: false })
+const DatePickerWrapper = (props: DatePickerProps) => {
+  const DatePicker = require('react-datepicker').default;
+
+  return <DatePicker {...props} />;
+};
+const DatePicker = dynamic(() => Promise.resolve(DatePickerWrapper), { ssr: false });
+
 const PhoneInput = dynamic(() => import('react-phone-input-2'), { ssr: false })
 
 const visaTypes = [
