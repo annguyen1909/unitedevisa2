@@ -22,7 +22,7 @@ interface Application {
 interface User {
   id: string;
   email?: string;
-  [key: string]: any;
+  // Add other known user properties here if needed, or remove the index signature to avoid 'any'
 }
 
 export default function ApplicationListPage() {
@@ -33,7 +33,7 @@ export default function ApplicationListPage() {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const openModal = (app: any) => {
+  const openModal = (app: Application) => {
     setSelectedApp(app);
     setModalOpen(true);
   };
@@ -70,7 +70,7 @@ export default function ApplicationListPage() {
       )}
 
       <div className="space-y-4">
-        {applications.map((app: any) => (
+        {applications.map((app: Application) => (
           <div key={app.id} className="border rounded-lg p-4 shadow">
             <div className="flex justify-between items-start">
               <div>
