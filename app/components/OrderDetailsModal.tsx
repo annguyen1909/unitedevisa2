@@ -1,10 +1,23 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/app/components/ui/dialog';
 
+interface Application {
+  destination: string;
+  visa_type: string;
+  staying_from: string | Date;
+  staying_to: string | Date;
+  nationality: string;
+  paper_type: string;
+  email: string;
+  phone: string;
+  status: string;
+  inserted_at: string | Date;
+}
+
 interface OrderDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  application: any | null;
+  application: Application | null;
 }
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, onClose, application }) => {

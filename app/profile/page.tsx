@@ -3,9 +3,18 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
+type Profile = {
+  id: string
+  full_name: string
+  email: string
+  area_code: string
+  phone: string
+  joined_at: string
+}
+
 export default function ProfilePage() {
   const router = useRouter()
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
 
   useEffect(() => {
     const load = async () => {

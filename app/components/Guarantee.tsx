@@ -14,8 +14,8 @@ const Guarantee = () => {
           </h2>
           <p className="text-xl text-gray-600 mb-8">Guaranteed!</p>
           <p className="text-gray-600 max-w-3xl mx-auto">
-            We're so confident in our service that if your visa application gets rejected, 
-            we'll refund your service fee completely. Your satisfaction is our guarantee.
+            We&apos;re so confident in our service that if your visa application gets rejected, 
+            we&apos;ll refund your service fee completely. Your satisfaction is our guarantee.
           </p>
         </div>
       </div>

@@ -48,7 +48,7 @@ type ApplicationFormValues = {
 }
 
 export default function ApplicationForm() {
-  const { register, handleSubmit, control, formState: { errors } } = useForm<ApplicationFormValues>({
+  const { register, handleSubmit, control } = useForm<ApplicationFormValues>({
     defaultValues: {
       passengers: [{}], // Start with one passenger form
     },
@@ -62,7 +62,7 @@ export default function ApplicationForm() {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
   const [startDate, endDate] = dateRange
 
-const onSubmit = async (data: any) => {
+const onSubmit = async (data: ApplicationFormValues) => {
   if (!startDate || !endDate) {
     alert('Please select a staying time range.')
     return
@@ -75,14 +75,14 @@ const onSubmit = async (data: any) => {
     return
   }
 
-  const applications = data.passengers.map((p: any) => ({
+  const applications = data.passengers.map((p: Passenger) => ({
     user_id: user.id,
-    destination: p.destination.value,
-    visa_type: p.visaType.value,
+    destination: p.destination?.value,
+    visa_type: p.visaType?.value,
     email: p.email,
     phone: p.phone,
-    nationality: p.nationality.value,
-    paper_type: p.paperType.value,
+    nationality: p.nationality?.value,
+    paper_type: p.paperType?.value,
     staying_from: startDate.toISOString(),
     staying_to: endDate.toISOString(),
     status: 'pending',

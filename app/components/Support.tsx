@@ -12,7 +12,7 @@ const Support = () => {
             <Headphones className="h-12 w-12 text-yellow-600 mr-4" />
             <div>
               <h3 className="text-2xl font-bold text-gray-900">24/7 Customer Support 🎧</h3>
-              <p className="text-gray-600">Get help whenever you need it. We're here to assist you every step of the way.</p>
+              <p className="text-gray-600">Get help whenever you need it. We&apos;re here to assist you every step of the way.</p>
             </div>
           </div>
           <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium">

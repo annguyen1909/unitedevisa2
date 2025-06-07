@@ -5,12 +5,32 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import OrderDetailsModal from '../../components/OrderDetailsModal';
 
+interface Application {
+  id: string;
+  destination: string;
+  visa_type: string;
+  staying_from: string;
+  staying_to: string;
+  email: string;
+  phone: string;
+  nationality: string;
+  paper_type: string;
+  status: string;
+  inserted_at: string;
+}
+
+interface User {
+  id: string;
+  email?: string;
+  [key: string]: any;
+}
+
 export default function ApplicationListPage() {
-  const [user, setUser] = useState<any>(null);
-  const [applications, setApplications] = useState<any[]>([]);
+  const [, setUser] = useState<User | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
   const router = useRouter();
 
-  const [selectedApp, setSelectedApp] = useState<any | null>(null);
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const openModal = (app: any) => {
@@ -32,12 +52,10 @@ export default function ApplicationListPage() {
 
       const { data, error } = await supabase
         .from('visa_applications')
-        .select('*')
-        .eq('user_id', userData.user.id)
-        .order('inserted_at', { ascending: false });
+        .select('*');
 
       if (error) console.error('Error fetching applications:', error);
-      else setApplications(data);
+      else setApplications(data || []);
     };
 
     fetchUserAndApps();

@@ -8,7 +8,7 @@ import { UserRoundPen } from 'lucide-react';
 
 export default function HeaderBanner() {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
