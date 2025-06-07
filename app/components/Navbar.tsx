@@ -38,7 +38,7 @@ export default function Navbar() {
               className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
             />
             <Image
-              src="/images/logotext.png"
+              src="/images/LogoText.png"
               alt="Logo"
               width={150}
               height={50}
